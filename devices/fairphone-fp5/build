@@ -74,6 +74,9 @@ ln -sf /var/lib/firmware-extract /usr/lib/firmware/updates
 mkdir -p /usr/share/qcom/qcm6490/Fairphone
 ln -sf /var/lib/blob-wrangler/sensors /usr/share/qcom/qcm6490/Fairphone/fp5
 
+# A shell over the USB gadget, for when wifi and the usb network are down
+systemctl enable serial-getty@ttyGS0.service
+
 systemctl enable \
     hexagonrpcd-adsp-sensorspd.service \
     hexagonrpcd-adsp-rootpd.service \
