@@ -63,6 +63,11 @@ dnf -y install --enable-repo='copr:copr.fedorainfracloud.org:samcday:blob-wrangl
 
 dnf -y install make-dynpart-mappings
 
+# The rpm ships its own fairphone,fp5.toml and overwrites the one copied in at
+# the top of this script, which silently drops the folders section - the ADSP
+# content then never gets extracted. Put ours back after the install.
+cp -arfT files/usr/share/blob-wrangler /usr/share/blob-wrangler
+
 systemctl enable blob-wrangler.service
 
 # /usr is read-only, so point the two paths that receive extracted content at
