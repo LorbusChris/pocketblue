@@ -36,7 +36,7 @@ firmware = [
 folders = [
     { partition = "vendor", destination = "/var/lib/blob-wrangler/sensors", folders = [
         { name = "etc/acdbdata", rename = "acdb" },
-        { name = "etc/sensors" },
+        { name = "etc/sensors", rename = "sensors" },
     ] },
     { partition = "dsp", destination = "/var/lib/blob-wrangler/sensors/dsp", folders = [
         { name = "adsp" },

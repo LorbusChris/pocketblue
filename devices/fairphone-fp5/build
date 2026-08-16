@@ -58,7 +58,7 @@ dnf -y swap --repo='copr:copr.fedorainfracloud.org:pocketblue:common' \
 # firmware (a660_sqe, a660_gmu).
 # --enable-repo rather than --repo: blob-wrangler needs kmod, and --repo would
 # restrict resolution to the copr alone.
-dnf -y install --enable-repo='copr:copr.fedorainfracloud.org:samcday:blob-wrangler-nightly' \
+dnf -y install --enable-repo='copr:copr.fedorainfracloud.org:group_mobility:common' \
     blob-wrangler
 
 dnf -y install make-dynpart-mappings
