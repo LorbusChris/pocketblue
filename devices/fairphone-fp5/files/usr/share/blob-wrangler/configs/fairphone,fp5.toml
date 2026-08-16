@@ -1,0 +1,51 @@
+# Overrides the config shipped by blob-wrangler, which covers the firmware
+# files but none of the hexagonfs content hexagonrpcd and the sensor stack need.
+#
+# /usr/share/qcom/qcm6490/Fairphone/fp5 - where hexagonrpcd looks - is a symlink
+# to /var/lib/blob-wrangler/sensors, created by the device build.
+[wrangler]
+dynpart = "super"
+
+firmware = [
+    { partition = "vendor", origin = "firmware", destination = "qcom/qcm6490/fairphone5", files = [
+            { name = "a660_zap.mdt" },
+            { name = "aw882xx_acf.bin", rename = "aw88261_acf.bin" },
+            { name = "vpu20_1v.mdt", rename = "venus.mdt" },
+            { name = "yupik_ipa_fws.mdt", rename = "ipa_fws.mdt" },
+        ] },
+    { partition = "modem", origin = "image", destination = "qcom/qcm6490/fairphone5", files = [
+            { name = "adsp.mdt" },
+            { name = "adspr.jsn" },
+            { name = "adsps.jsn" },
+            { name = "adspua.jsn" },
+            { name = "battmgr.jsn" },
+            { name = "cdsp.mdt" },
+            { name = "cdspr.jsn" },
+            { name = "modem.mdt" },
+            { name = "modemr.jsn" },
+            { name = "wpss.mdt" },
+        ] },
+    { partition = "bluetooth", origin = "image", destination = "qca", files = [
+            { name = "msbtfw11.mbn" },
+            { name = "msnv11.bin" },
+        ] },
+]
+
+# ADSP-served content, verified against a device. socinfo is not on any
+# partition - it is shipped in the image instead, see fp5-socinfo.
+folders = [
+    { partition = "vendor", destination = "/var/lib/blob-wrangler/sensors", folders = [
+        { name = "etc/acdbdata", rename = "acdb" },
+        { name = "etc/sensors" },
+    ] },
+    { partition = "dsp", destination = "/var/lib/blob-wrangler/sensors/dsp", folders = [
+        { name = "adsp" },
+        { name = "cdsp" },
+    ] },
+    { partition = "persist", destination = "/var/lib/blob-wrangler/sensors/sensors", folders = [
+        { name = "sensors/registry/registry" },
+    ] },
+    { partition = "modem", destination = "/var/lib/firmware-extract/qcom/qcm6490/fairphone5", folders = [
+        { name = "image/modem_pr", rename = "modem_pr" },
+    ] },
+]

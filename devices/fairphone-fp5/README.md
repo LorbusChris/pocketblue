@@ -407,7 +407,7 @@ If you see `failed to load a660_sqe.fw` errors:
 
 1. Verify GPU firmware:
    ```bash
-   ls -la /usr/lib/firmware/qcom/qcm6490/fairphone5/a660_*
+   ls -la /var/lib/firmware-extract/qcom/qcm6490/fairphone5/a660_*
    ls -la /usr/lib/firmware/qcom/a660_*
    ```
 
@@ -549,6 +549,43 @@ not enabled directly:
 | `/usr/share/wireplumber/wireplumber.conf.d/52-fairphone-fp5.conf` | WirePlumber FP5-specific output rules |
 | `/usr/share/libcamera/ipa/simple/{imx858,s5kjn1}.yaml` | libcamera IPA tuning files for rear wide and front cameras |
 | `/usr/lib/bootc/kargs.d/90-fairphone-fp5.toml` | Kernel boot arguments (`clk_ignore_unused`, `earlycon=efifb`) |
+
+### Firmware
+
+The image ships **no** Fairphone or Qualcomm vendor firmware. It is extracted
+from the phone's own stock Android partitions at boot by
+[blob-wrangler](https://github.com/samcday/blob-wrangler), so we never
+redistribute the blobs.
+
+This works because the install only writes `logdump`, `rawdump` and `userdata`.
+**Do not erase or repartition `super`, `modem`, `dsp`, `bluetooth` or
+`persist`** - doing so removes the only copy of the firmware and the device
+will lose display, audio, sensors, modem and Bluetooth.
+
+`blob-wrangler.service` runs on every boot, before the display manager. It maps
+the logical partitions in `super` with `make-dynpart-mappings`, mounts
+`vendor`, `modem`, `dsp` and `persist` read-only, and writes to
+`/var/lib/firmware-extract`, which the kernel picks up because
+`/usr/lib/firmware/updates` symlinks there. `.mdt` plus its `.b*` segments are
+squashed into a single `.mbn`, so no symlink tricks are needed. The device
+configuration lives in `/usr/share/blob-wrangler/configs/fairphone,fp5.toml`.
+
+Nothing is extracted in the initramfs, because nothing there needs it: the
+display runs on the simple framebuffer u-boot hands over (`simpledrm`), and
+plymouth is up well before `msm` would bind. Modules whose firmware only exists
+after extraction (`msm`, `qcom_q6v5_pas`, `ipa`, `venus_core`, `hci_uart`) are
+blacklisted so udev cannot probe them too early, and are loaded once their
+firmware is in place - the display moves from `simpledrm` to `msm` at that
+point.
+
+The ADSP content hexagonrpcd serves lands in `/var/lib/blob-wrangler/sensors`,
+which `/usr/share/qcom/qcm6490/Fairphone/fp5` points at: `acdb` and `sensors`
+from `vendor`, `dsp` from the `dsp` partition, the sensor registry from
+`persist`, and `socinfo` seeded from the image, since it is synthesised by
+Android at runtime rather than stored on a partition.
+
+The redistributable GPU core firmware (`a660_sqe`, `a660_gmu`) and the ath11k /
+QCA WiFi and Bluetooth firmware still come from Fedora packages.
 
 ### Kernel
 

@@ -1,0 +1,5 @@
+# The rawhide base does not declare a default root filesystem, so
+# image-builder fails with "missing required info: DefaultRootFs". btrfs is
+# what pocketblue built these images with before the image-builder migration.
+[install.filesystem.root]
+type = "btrfs"
